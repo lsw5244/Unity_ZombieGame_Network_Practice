@@ -79,6 +79,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         _connectionInfoText.text = "포톤 서버에 접속 성공";
 
         PhotonNetwork.LoadLevel(/*"Main Scene"*/(int)ESceneID.Main); // loadScene 같다. 룸의 모든 사람들을 옮긴다 ?
-        
+        //DontDestroyOnLoad((int)ESceneID.Main);
     }
 }

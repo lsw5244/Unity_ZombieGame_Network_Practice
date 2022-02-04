@@ -244,8 +244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ee1fe8abee54b944b32f5141d058126, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _connectionInfoText: {fileID: 0}
-  _joinButton: {fileID: 0}
+  _connectionInfoText: {fileID: 913370810}
+  _joinButton: {fileID: 1061531079}
 --- !u!1 &913370808
 GameObject:
   m_ObjectHideFlags: 0

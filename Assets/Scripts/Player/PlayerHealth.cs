@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI; // UI 관련 코드
-
+using Photon.Pun;
 // 플레이어 캐릭터의 생명체로서의 동작을 담당
 public class PlayerHealth : LivingEntity
 {
@@ -47,6 +47,7 @@ public class PlayerHealth : LivingEntity
     //}
 
     // 데미지 처리
+    [PunRPC]
     public override void TakeDamage(float damage, Vector3 hitPoint, Vector3 hitDirection)
     {
         // LivingEntity의 OnDamage() 실행(데미지 적용)
@@ -69,6 +70,8 @@ public class PlayerHealth : LivingEntity
 
         _playerMovement.enabled = false;
         _playerShooter.enabled = false;
+
+        Invoke("Respawn", 5f);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -83,9 +86,26 @@ public class PlayerHealth : LivingEntity
 
         if(item != null)
         {
-            item.Use(gameObject);
+            if(PhotonNetwork.IsMasterClient)
+            {
+                item.Use(gameObject);
+            }
 
             _audioPlayer.PlayOneShot(ItemPickupClip);
         }
+    }
+
+    public void Respawn()
+    {
+        if(photonView.IsMine)
+        {
+            Vector3 randomSpawnPos = Random.insideUnitSphere * 5f;
+            randomSpawnPos.y = 0f;
+
+            transform.position = randomSpawnPos;
+        }
+
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
     }
 }

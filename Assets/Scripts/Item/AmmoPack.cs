@@ -14,7 +14,7 @@ public class AmmoPack : Item
         //if (playerShooter != null && playerShooter.Gun != null)
         {
             // 총의 남은 탄환 수를 ammo 만큼 더한다
-            playerShooter.Gun.ammoRemain += Ammo;
+            playerShooter.Gun.RemainedAmmo += Ammo;
         }
 
         // 사용되었으므로, 자신을 파괴

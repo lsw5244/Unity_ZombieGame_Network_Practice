@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 
 // 주어진 Gun 오브젝트를 쏘거나 재장전
 // 알맞은 애니메이션을 재생하고 IK를 사용해 캐릭터 양손이 총에 위치하도록 조정
-public class PlayerShooter : MonoBehaviour
+public class PlayerShooter : MonoBehaviourPun
 {
     public Gun Gun; // 사용할 총
     public Transform GunPivot; // 총 배치의 기준점
@@ -33,8 +34,12 @@ public class PlayerShooter : MonoBehaviour
 
     private void Update()
     {
+        if (false == photonView.IsMine)
+        {
+            return;
+        }
         // 입력을 감지하고 총 발사하거나 재장전
-        if(_playerInput.CanFire)
+        if (_playerInput.CanFire)
         {
             Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -56,7 +61,7 @@ public class PlayerShooter : MonoBehaviour
         //if (Gun != null && UIManager.Instance != null)
         {
             // UI 매니저의 탄약 텍스트에 탄창의 탄약과 남은 전체 탄약을 표시
-            UIManager.Instance.UpdateAmmoText(Gun.magAmmo, Gun.ammoRemain);
+            UIManager.Instance.UpdateAmmoText(Gun.MagAmmo, Gun.RemainedAmmo);
         }
     }
 
