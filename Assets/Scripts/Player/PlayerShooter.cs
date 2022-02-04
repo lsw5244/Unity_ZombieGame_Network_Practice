@@ -67,7 +67,7 @@ public class PlayerShooter : MonoBehaviour
         GunPivot.position = _playerAnimator.GetIKHintPosition(AvatarIKHint.RightElbow);
         // 손 위치 맞추기
         setIkTransform(AvatarIKGoal.LeftHand, LeftHandMount);
-        setIkTransform(AvatarIKGoal.RightHand, RightHandMount);    
+        setIkTransform(AvatarIKGoal.RightHand, RightHandMount);
     }
     // 목표지점? 적용 할 애니메이션 ?, 실제로 옮길 곳
     private void setIkTransform(AvatarIKGoal goal, Transform golaTransfrom, float weight = 1f)

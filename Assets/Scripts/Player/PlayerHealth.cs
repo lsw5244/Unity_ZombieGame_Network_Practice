@@ -4,7 +4,6 @@ using UnityEngine.UI; // UI 관련 코드
 // 플레이어 캐릭터의 생명체로서의 동작을 담당
 public class PlayerHealth : LivingEntity
 {
-
     public AudioClip DeathClip; // 사망 소리
     public AudioClip HitClip; // 피격 소리
     public AudioClip ItemPickupClip; // 아이템 습득 소리

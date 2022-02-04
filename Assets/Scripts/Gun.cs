@@ -73,10 +73,10 @@ public class Gun : MonoBehaviour
     {
         bulletLineRenderer.SetPosition(0, fireTransform.position);
         RaycastHit hit; // 레이와 충돌한 객체가 담길 공간
-
+        // 충돌 안했을 때 기본 충돌 포인트 설정
         Vector3 hitPosition = fireTransform.position + fireTransform.forward * fireDistance;
 
-        // 시작지점, 방향, 함수에 의해 결과값이 담길 것(아웃(인풋) 파라미터 ?), 레이 길이
+        // 시작지점, 방향, 함수에 의해 결과값이 담길 것(아웃 파라미터 ), 레이 길이
         if (Physics.Raycast(fireTransform.position, fireTransform.forward, out hit, fireDistance))
         {
             // 충돌 처리

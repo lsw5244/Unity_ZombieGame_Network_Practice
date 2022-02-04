@@ -180,6 +180,7 @@ private void Awake()
 
                 // 해당 포지션으로부터 가장 가까운 점 반환 ?
                 Vector3 hitPoint = other.ClosestPoint(transform.position);
+                // 맞은 위치에서 타겟으로 향하는 노멀백터(방향?)
                 Vector3 hitNormal = transform.position - other.transform.position;
 
                 attackTarget.TakeDamage(Damage, hitPoint, hitNormal);
