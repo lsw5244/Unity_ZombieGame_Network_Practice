@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 점수와 게임 오버 여부를 관리하는 게임 매니저
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     // 싱글톤 접근용 프로퍼티
     public static GameManager Instance
@@ -25,6 +27,9 @@ public class GameManager : MonoBehaviour
     private int _score = 0; // 현재 게임 점수
     public bool IsGameover { get; private set; } // 게임 오버 상태
 
+    [SerializeField]
+    private GameObject PlayerPrefab;
+
     private void Awake()
     {
         // 씬에 싱글톤 오브젝트가 된 다른 GameManager 오브젝트가 있다면
@@ -37,8 +42,26 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        Vector3 randomSpawnPos = Random.insideUnitSphere * 5f;
+        randomSpawnPos.y = 0f;
+
+        /*GameObject player = */PhotonNetwork.Instantiate(PlayerPrefab.name, randomSpawnPos, Quaternion.identity);
+
         // 플레이어 캐릭터의 사망 이벤트 발생시 게임 오버
-        FindObjectOfType<PlayerHealth>().OnDeath += EndGame;
+        //FindObjectOfType<PlayerHealth>().OnDeath += EndGame;
+    }
+    
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            PhotonNetwork.LeaveRoom(); // 방 나가기
+        }
+    }
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene((int)ESceneID.Lobby);
     }
 
     // 점수를 추가하고 UI 갱신
@@ -61,5 +84,18 @@ public class GameManager : MonoBehaviour
         IsGameover = true;
         // 게임 오버 UI를 활성화
         UIManager.Instance.SetActiveGameoverUi(true);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if(stream.IsWriting)
+        {
+            stream.SendNext(_score);
+        }
+        else
+        {
+            _score = (int)stream.ReceiveNext();
+            UIManager.Instance.UpdateScoreText(_score);
+        }
     }
 }

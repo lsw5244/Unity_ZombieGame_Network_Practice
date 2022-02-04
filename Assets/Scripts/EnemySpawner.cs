@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // 적 게임 오브젝트를 주기적으로 생성
-public class EnemySpawner : MonoBehaviour
+public class EnemySpawner : MonoBehaviourPun, IPunObservable
 {
     public Enemy EnemyPrefab; // 생성할 적 AI
     public int MaxEnemyCount;
@@ -32,25 +35,30 @@ public class EnemySpawner : MonoBehaviour
     {
         _pointCount = SpawnPoints.Length;
 
-        _enemyPool = new Enemy[MaxEnemyCount];
-        for(int i = 0; i < MaxEnemyCount; ++i)
-        {
-            _enemyPool[i] = Instantiate(EnemyPrefab);
-        }
+        //_enemyPool = new Enemy[MaxEnemyCount];
+        //for(int i = 0; i < MaxEnemyCount; ++i)
+        //{
+        //    _enemyPool[i] = Instantiate(EnemyPrefab);
+        //}
+
+        PhotonPeer.RegisterType(typeof(Color), 128, ColorSerializer.Serialize, ColorSerializer.Deserialize);
     }
 
     private void Update()
     {
-        // 게임 오버 상태일때는 생성하지 않음
-        if (/*GameManager.Instance != null && */GameManager.Instance.IsGameover)
+        if(PhotonNetwork.IsMasterClient)
         {
-            return;
-        }
+            // 게임 오버 상태일때는 생성하지 않음
+            if (/*GameManager.Instance != null && */GameManager.Instance.IsGameover)
+            {
+                return;
+            }
 
-        // 적을 모두 물리친 경우 다음 스폰 실행
-        if (/*_enemies.Count*/_remainEnemyCount <= 0)
-        {
-            spawnWave();
+            // 적을 모두 물리친 경우 다음 스폰 실행
+            if (/*_enemies.Count*/_remainEnemyCount <= 0)
+            {
+                spawnWave();
+            }
         }
 
         // UI 갱신
@@ -92,20 +100,44 @@ public class EnemySpawner : MonoBehaviour
         int spawnIndex = Random.Range(0, _pointCount);
         Transform spawnPoint = SpawnPoints[spawnIndex];
 
-        Enemy enemy = Instantiate(EnemyPrefab, spawnPoint.position, spawnPoint.rotation); // 
-        enemy.Setup(health, damage, speed, skinColor);
+        GameObject enemyObj = PhotonNetwork.Instantiate(EnemyPrefab.gameObject.name, spawnPoint.position, spawnPoint.rotation); // 
+        Enemy enemy = enemyObj.GetComponent<Enemy>();
+
+        enemy.photonView.RPC("Setup", RpcTarget.All, health, damage, speed, skinColor);
+        //enemy.Setup(health, damage, speed, skinColor);
         //_enemies.Add(enemy);
         //enemy.OnDeath += () => _enemies.Remove(enemy);
         enemy.OnDeath += () => 
         {
             --_remainEnemyCount;
-            Destroy(enemy.gameObject, 10f);
+            //Destroy(enemy.gameObject, 10f);
+
+            StartCoroutine(destroyAfter(enemy.gameObject, 10f));
             GameManager.Instance.AddScore(100);
         };
         //enemy.OnDeath += reduceEnemyCount;
         //enemy.OnDeath += () => { Destroy(enemy.gameObject, 10f); };
         //enemy.OnDeath += () => { GameManager.Instance.AddScore(100); };
+    }
 
+    IEnumerator destroyAfter(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        PhotonNetwork.Destroy(obj);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if(stream.IsWriting)
+        {
+            stream.SendNext(_remainEnemyCount);
+            stream.SendNext(_wave);
+        }
+        else
+        {
+            _remainEnemyCount = (int)stream.ReceiveNext();
+            _wave = (int)stream.ReceiveNext();
+        }
     }
 
     //private void reduceEnemyCount()
