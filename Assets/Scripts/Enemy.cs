@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI; // AI, 내비게이션 시스템 관련 코드를 가져오기
+using Photon.Pun;
 
 // 적 AI를 구현한다
 public class Enemy : LivingEntity
@@ -71,6 +72,7 @@ private void Awake()
     }
 
     // 적 AI의 초기 스펙을 결정하는 셋업 메서드
+    [PunRPC]
     public void Setup(float newHealth, float newDamage, float newSpeed, Color skinColor)
     {
         StartingHealth = newHealth;
@@ -81,12 +83,20 @@ private void Awake()
 
     private void Start()
     {
+        if (false == PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
         // 게임 오브젝트 활성화와 동시에 AI의 추적 루틴 시작
         StartCoroutine(UpdatePath());
     }
 
     private void Update()
     {
+        if (false == PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
         // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
         //_animator.SetBool(AnimParamID.HasTarget, HasSearchedTarget());
         _animator.SetBool(ZombieAnimID.HAS_TARGET, HasSearchedTarget());
@@ -169,6 +179,10 @@ private void Awake()
 
     private void OnTriggerStay(Collider other)
     {
+        if(false == PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
         // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
         if (IsDead == false && Time.time >= _lastAttackTime + AttackCoolTime)
         {
