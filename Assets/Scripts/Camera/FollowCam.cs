@@ -8,11 +8,15 @@ public class FollowCam : MonoBehaviour
 
     private Vector3 distance;
 
-    public void SetTarget(Transform transform)
+    private bool IsOn = false;
+
+    public void SetTarget(Transform target)
     {
-        _target = transform;
+        _target = target;
 
         distance = _target.position - transform.position;
+
+        IsOn = true;
     }
 
     void LateUpdate()
