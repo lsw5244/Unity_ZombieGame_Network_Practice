@@ -104,7 +104,7 @@ public class Gun : MonoBehaviourPun, IPunObservable
         {
             CurrState = EState.Empty;
         }
-        //bulletLineRenderer.SetPosition(0, fireTransform.position);
+        bulletLineRenderer.SetPosition(0, fireTransform.position);
         //RaycastHit hit; // 레이와 충돌한 객체가 담길 공간
         //// 충돌 안했을 때 기본 충돌 포인트 설정
         //Vector3 hitPosition = fireTransform.position + fireTransform.forward * fireDistance;
